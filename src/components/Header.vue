@@ -1,11 +1,13 @@
 <template>
-  <div id="app">
-    <router-view></router-view>
+  <div class="hello">
+
   </div>
 </template>
 
 <script>
 export default {
-  name: 'App'
+  name: 'v-header',
+  props: {}
 }
 </script>
+
