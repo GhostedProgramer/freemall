@@ -72,6 +72,7 @@
                       href="javascipt:;"
                       class="checkbox-btn item-check-btn"
                       :class="{'checked':item.checked}"
+                      @click="editCart('check',item)"
                     >
                       <svg class="icon icon-ok">
                         <use xlink:href="#icon-ok" />
@@ -92,15 +93,15 @@
                   <div class="item-quantity">
                     <div class="select-self select-self-open">
                       <div class="select-self-area">
-                        <a class="input-sub">-</a>
+                        <a class="input-sub" v-on:click="editCart('minus',item)">-</a>
                         <span class="select-ipt">{{item.productNum}}</span>
-                        <a class="input-add">+</a>
+                        <a class="input-add" v-on:click="editCart('add',item)">+</a>
                       </div>
                     </div>
                   </div>
                 </div>
                 <div class="cart-tab-4">
-                  <div class="item-price-total">￥{{item.productNum*item.productPrice}}元</div>
+                  <div class="item-price-total">{{(item.productNum*item.productPrice) | currency}}</div>
                 </div>
                 <div class="cart-tab-5">
                   <div class="cart-item-opration">
@@ -166,12 +167,29 @@ export default {
   mounted() {
     this.init();
   },
+  filters: {
+    currency(value) {
+      if (!value) return 0.0;
+      return '￥' + value.toFixed(2) + '元';
+    }
+  },
   methods: {
+    //初始化购物车列表
     init() {
       this.axios.get("/mock/cart.json").then(response => {
         let res = response.data;
         this.cartList = res.data;
       });
+    },
+    //修改购物车数量
+    editCart(type, item) {
+      if (type == "minus") {
+        item.productNum--;
+      } else if (type == "add") {
+        item.productNum++;
+      } else {
+        item.checked = !item.checked;
+      }
     }
   }
 };
