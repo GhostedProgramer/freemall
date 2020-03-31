@@ -105,7 +105,7 @@
                 </div>
                 <div class="cart-tab-5">
                   <div class="cart-item-opration">
-                    <a href="javascript:;" class="item-edit-btn">
+                    <a href="javascript:;" class="item-edit-btn" @click="delCartConfirm(item)">
                       <svg class="icon icon-del">
                         <use xlink:href="#icon-del" />
                       </svg>
@@ -143,7 +143,15 @@
         </div>
       </div>
     </div>
-    <modal></modal>
+    <modal :mdShow="modalConfirm" @close="closeModal">
+      <template v-slot:message>
+        <p>你确认要删除此条数据吗?</p>
+      </template>
+      <template v-slot:btnGroup>
+        <a class="btn btn--m" href="javascript:;" @click="delCart">确认</a>
+        <a class="btn btn--m btn--red" href="javascript:;" @click="modalConfirm = false">关闭</a>
+      </template>
+    </modal>
     <nav-footer></nav-footer>
   </div>
 </template>
@@ -156,6 +164,8 @@ export default {
   name: "cart",
   data() {
     return {
+      modalConfirm: false,
+      delItem: "",
       cartList: []
     };
   },
@@ -170,7 +180,7 @@ export default {
   filters: {
     currency(value) {
       if (!value) return 0.0;
-      return '￥' + value.toFixed(2) + '元';
+      return "￥" + value.toFixed(2) + "元";
     }
   },
   methods: {
@@ -190,6 +200,25 @@ export default {
       } else {
         item.checked = !item.checked;
       }
+    },
+    //删除物品确认
+    delCartConfirm(item) {
+      this.delItem = item;
+      this.modalConfirm = true;
+    },
+    //关闭确认弹框
+    closeModal(){
+      this.modalConfirm = false;
+    },
+    //删除购物车数据
+    delCart(){
+      let delItem = this.delItem;
+      this.cartList.forEach((item,index)=>{
+        if(delItem.productId == item.productId){
+          this.cartList.splice(index,1);
+          this.modalConfirm = false;
+        }
+      });
     }
   }
 };
