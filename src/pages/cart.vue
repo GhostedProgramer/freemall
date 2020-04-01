@@ -120,8 +120,8 @@
           <div class="cart-foot-inner">
             <div class="cart-foot-l">
               <div class="item-all-check">
-                <a href="javascipt:;">
-                  <span class="checkbox-btn item-check-btn check">
+                <a href="javascipt:;" @click="toggelCheckAll">
+                  <span class="checkbox-btn item-check-btn" :class="{'check':checkAllFlag}">
                     <svg class="icon icon-ok">
                       <use xlink:href="#icon-ok" />
                     </svg>
@@ -133,10 +133,10 @@
             <div class="cart-foot-r">
               <div class="item-total">
                 总价:
-                <span class="total-price">￥89.00元</span>
+                <span class="total-price">{{money | currency}}</span>
               </div>
               <div class="btn-wrap">
-                <a class="btn btn--red btn--dis">结算</a>
+                <a class="btn btn--red" :class="{'btn--dis':!cartChecked}" @click="checkout">结算</a>
               </div>
             </div>
           </div>
@@ -174,6 +174,28 @@ export default {
     NavFooter,
     Modal
   },
+  computed: {
+    checkAllFlag() {
+      return this.cartList.every(item => {
+        return item.checked;
+      });
+    },
+    cartChecked() {
+      return this.cartList.some(item => {
+        return item.checked;
+      });
+    },
+    //总金额
+    money() {
+      let money = 0;
+      this.cartList.forEach(item => {
+        if (item.checked) {
+          money += item.productNum * item.productPrice;
+        }
+      });
+      return money;
+    }
+  },
   mounted() {
     this.init();
   },
@@ -207,18 +229,33 @@ export default {
       this.modalConfirm = true;
     },
     //关闭确认弹框
-    closeModal(){
+    closeModal() {
       this.modalConfirm = false;
     },
     //删除购物车数据
-    delCart(){
+    delCart() {
       let delItem = this.delItem;
-      this.cartList.forEach((item,index)=>{
-        if(delItem.productId == item.productId){
-          this.cartList.splice(index,1);
+      this.cartList.forEach((item, index) => {
+        if (delItem.productId == item.productId) {
+          this.cartList.splice(index, 1);
           this.modalConfirm = false;
         }
       });
+    },
+    //全选和反选
+    toggelCheckAll() {
+      let flag = !this.checkAllFlag;
+      this.cartList.forEach(item => {
+        item.checked = flag;
+      });
+    },
+    //结算跳转地址页面
+    checkout() {
+      if (this.cartChecked) {
+        this.$router.push({
+          path: "/address"
+        });
+      }
     }
   }
 };
